@@ -26,13 +26,14 @@ class MonsterTextParser:
     def __init__(self, keywords: tuple):
         self.keywords = keywords
 
-    def count_words(self, results: Union[MonsterListing, MonsterSearch], as_percentage: bool = False) -> DataFrame:
+    def count_words(self, results: Union[MonsterListing, MonsterSearch], as_percentage: bool = False,
+                    delete_matching: str = "[^a-zA-Z]") -> DataFrame:
 
         freqs = Counter()
         if type(results) == MonsterListing:
-            freqs.update(self.words_from_description(results))
+            freqs.update(self.words_from_description(results, delete_matching=delete_matching))
         else:
-            [freqs.update(self.words_from_description(listing)) for listing in results]
+            [freqs.update(self.words_from_description(listing, delete_matching=delete_matching)) for listing in results]
 
         out_dict = dict([(x, freqs[x.lower()]) for x in self.keywords])
 
@@ -42,7 +43,7 @@ class MonsterTextParser:
             df['Frequency'] = df['Frequency'] * 100 / (1 if type(results) == MonsterListing else len(results))
         return df.sort_values(by='Frequency', ascending=False).reset_index(drop=True)
 
-    def words_from_description(self, listing: MonsterListing, delete_matching: str = "[^a-zA-Z.+3]") -> list:
+    def words_from_description(self, listing: MonsterListing, delete_matching: str = "[^a-zA-Z]") -> list:
         """
         Extract words from description in listing. Some code lifted from Jesse Steinweg-Woods' blog post.
         :param listing: MonsterListing to get words from
@@ -73,8 +74,9 @@ class MonsterTextParser:
         stop_words = set(stopwords.words("english"))
 
         words = list()
+        keywords_lower = [x.lower() for x in self.keywords]
         for w in text:
-            if w not in [x.lower() for x in self.keywords]:
+            if w not in keywords_lower:
                 w = w.replace('.', '')
             if w not in stop_words and len(w) > 0:
                 words.append(w)
@@ -105,7 +107,8 @@ class MonsterLocation:
         :return: A MonsterLocation from the location string
         """
         city, state = [x.strip() for x in loc_string.split(',')]
-        return MonsterLocation(*cls.format_location(city, state), alternates=alternates)
+
+        return cls(*cls.format_location(city, state), alternates=alternates)
 
     def __init__(self, city: str, state: str, alternates: tuple = ()):
         """
@@ -266,7 +269,7 @@ class MonsterSearch:
 
         deser_results = dict([(job_id, MonsterListing.json_deserialize(in_dict=results[job_id])) for job_id in results])
 
-        return MonsterSearch(location, query, extra_titles=extra_titles, results=deser_results, job_ids=job_ids)
+        return cls(location, query, extra_titles=extra_titles, results=deser_results, job_ids=job_ids)
 
     # for iterating through results
     def __iter__(self):
@@ -343,7 +346,7 @@ class MonsterListing:
             job_url = item.find('h2', attrs={'class': 'title'}).find('a', href=True)['href']
 
             # add MonsterListing to results
-            return MonsterListing(job_id, job_url, location, company, job_title)
+            return cls(job_id, job_url, location, company, job_title)
 
     @classmethod
     def from_id(cls, job_id) -> Optional[MonsterListing]:
@@ -355,9 +358,9 @@ class MonsterListing:
 
         # get first item
         item = soup.find('section', attrs={'data-jobid': True})
-        return MonsterListing.from_search_results(item)
+        return cls.from_search_results(item)
 
-    def __str__(self):
+    def __str__(self) -> str:
         out_str = \
             f'Job Title: {self.job_title}\n' \
             f'Company: {self.company}\n' \
@@ -390,7 +393,7 @@ class MonsterListing:
         description = in_dict['description']
         company = in_dict['company']
         job_title = in_dict['job_title']
-        return MonsterListing(job_id, job_url, location, company, job_title, description)
+        return cls(job_id, job_url, location, company, job_title, description)
 
     def fetch_description(self):
         response = requests.get(self.job_url)

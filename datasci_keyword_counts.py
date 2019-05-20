@@ -35,7 +35,8 @@ with open(filename, 'r') as f:
     search = MonsterSearch.json_deserialize(in_dict=json.load(f))
 
 # get individual keyword counts as percentage of ads mentioning the keyword
-tally = MonsterTextParser(DATA_SCI_KEYWORDS).count_words(search, as_percentage=True)
+delete_matching = "[^a-zA-Z.+3]"  # the "." and "3" are for D3.js
+tally = MonsterTextParser(DATA_SCI_KEYWORDS).count_words(search, as_percentage=True, delete_matching=delete_matching)
 
 top_10 = tally.iloc[:10]
 
