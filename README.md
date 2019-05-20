@@ -45,7 +45,7 @@ Also, keep `monster.py` in the same directory as your scripts so you can import 
 
 ## Walkthrough
 
-Take a look at the Jupyter notebook, which walks through the logic and shows some examples of how to use the classes in `monster.py` to construct queries, store/load search results, and count keywords in the returned results. You can also look at the examples in the root directory (`datasci_keyword_counts.py` anything that ends with `_tests.py` ).
+Take a look at the [Jupyter notebook](https://nbviewer.jupyter.org/github/benmayersohn/monster-scraping/blob/master/MonsterScraping.ipynb), which walks through the logic and shows some examples of how to use the classes in `monster.py` to construct queries, store/load search results, and count keywords in the returned results. You can also look at the examples in the root directory (`datasci_keyword_counts.py` anything that ends with `_tests.py` ).
 
 ## Results
 
