@@ -1,0 +1,4 @@
+__pycache__
+.idea
+.ipynb_checkpoints
+data/data_scientist_nyc_search_test.json
