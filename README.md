@@ -24,7 +24,7 @@ so there more variables in play than the change in platform.
 
 ## Installation
 
-To install the requirements for `phyre`, use
+To install the requirements for the scraper, use
 
 ```bash
 pip install -r requirements.txt
