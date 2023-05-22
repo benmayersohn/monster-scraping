@@ -2,5 +2,5 @@ nltk>=3.4.5
 matplotlib==3.0.3
 pandas==0.24.2
 beautifulsoup4==4.7.1
-requests==2.21.0
+requests==2.31.0
 urllib3==1.26.5
